@@ -27,3 +27,4 @@ FilenameTitlePlugin/obj
 FilenameTitlePlugin/bin
 FilenameTitlePlugin.Tests/obj
 FilenameTitlePlugin.Tests/bin
+*.zip
