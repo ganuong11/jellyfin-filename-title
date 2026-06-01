@@ -11,18 +11,15 @@ public class TitleUpdaterTask : IScheduledTask
     private readonly ILibraryManager _libraryManager;
     private readonly FilenameCleanerService _cleaner;
     private readonly ILogger<TitleUpdaterTask> _logger;
-    private readonly Plugin _plugin;
 
     public TitleUpdaterTask(
         ILibraryManager libraryManager,
         FilenameCleanerService cleaner,
-        ILogger<TitleUpdaterTask> logger,
-        Plugin plugin)
+        ILogger<TitleUpdaterTask> logger)
     {
         _libraryManager = libraryManager;
         _cleaner = cleaner;
         _logger = logger;
-        _plugin = plugin;
     }
 
     public string Name => "Update Titles from Filenames";
@@ -61,7 +58,7 @@ public class TitleUpdaterTask : IScheduledTask
 
                     // Safety rule: only update items whose title is still the raw filename
                     // Unless OverwriteExistingTitles is enabled
-                    var shouldUpdate = _plugin.Configuration.OverwriteExistingTitles
+                    var shouldUpdate = (Plugin.Instance?.Configuration.OverwriteExistingTitles ?? false)
                         || string.Equals(item.Name, rawName, StringComparison.OrdinalIgnoreCase);
 
                     if (shouldUpdate)

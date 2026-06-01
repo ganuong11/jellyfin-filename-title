@@ -5,6 +5,7 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.FilenameTitlePlugin;
@@ -12,17 +13,19 @@ namespace Jellyfin.Plugin.FilenameTitlePlugin;
 public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages, IDisposable
 {
     private readonly ILibraryManager _libraryManager;
-    private readonly FilenameCleanerService _cleaner = new();
+    private readonly FilenameCleanerService _cleaner;
     private readonly ILogger<Plugin> _logger;
 
     public Plugin(
         IApplicationPaths applicationPaths,
         IXmlSerializer xmlSerializer,
         ILibraryManager libraryManager,
+        IServiceProvider serviceProvider,
         ILogger<Plugin> logger)
         : base(applicationPaths, xmlSerializer)
     {
         _libraryManager = libraryManager;
+        _cleaner = serviceProvider.GetRequiredService<FilenameCleanerService>();
         _logger = logger;
         _libraryManager.ItemAdded += OnItemAdded;
         Instance = this;
