@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Filename Title</title>
+</head>
+<body>
+    <div id="FilenameTitleConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="FilenameTitleConfigForm">
+                    <div class="checkboxContainer">
+                        <label class="emby-checkbox-label">
+                            <input type="checkbox" id="OverwriteExistingTitles" is="emby-checkbox">
+                            <span>Overwrite existing titles</span>
+                        </label>
+                        <div class="fieldDescription">
+                            When enabled, the plugin will overwrite titles even if a metadata provider has already set one.
+                            When disabled (default), only items whose title still matches the raw filename are updated.
+                        </div>
+                    </div>
+                    <br />
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Save</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            (function () {
+                var pluginId = "3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c";
+
+                document.getElementById("FilenameTitleConfigPage").addEventListener("pageshow", function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        document.getElementById("OverwriteExistingTitles").checked = config.OverwriteExistingTitles;
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+                document.getElementById("FilenameTitleConfigForm").addEventListener("submit", function (e) {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        config.OverwriteExistingTitles = document.getElementById("OverwriteExistingTitles").checked;
+                        ApiClient.updatePluginConfiguration(pluginId, config).then(function () {
+                            Dashboard.processPluginConfigurationUpdateResult();
+                        });
+                    });
+                    e.preventDefault();
+                    return false;
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

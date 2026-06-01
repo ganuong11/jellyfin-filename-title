@@ -1,13 +1,15 @@
+using System.Globalization;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.FilenameTitlePlugin;
 
-public class Plugin : BasePlugin<PluginConfiguration>, IDisposable
+public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages, IDisposable
 {
     private readonly ILibraryManager _libraryManager;
     private readonly FilenameCleanerService _cleaner = new();
@@ -23,11 +25,24 @@ public class Plugin : BasePlugin<PluginConfiguration>, IDisposable
         _libraryManager = libraryManager;
         _logger = logger;
         _libraryManager.ItemAdded += OnItemAdded;
+        Instance = this;
     }
 
     public override string Name => "Filename Title";
 
     public override Guid Id => Guid.Parse("3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c");
+
+    public static Plugin? Instance { get; private set; }
+
+    public IEnumerable<PluginPageInfo> GetPages()
+    {
+        yield return new PluginPageInfo
+        {
+            Name = Name,
+            EmbeddedResourcePath = string.Format(CultureInfo.InvariantCulture,
+                "{0}.Configuration.configPage.html", GetType().Namespace)
+        };
+    }
 
     private void OnItemAdded(object? sender, ItemChangeEventArgs args)
     {
@@ -39,10 +54,14 @@ public class Plugin : BasePlugin<PluginConfiguration>, IDisposable
 
         // Safety rule: only update if the current title is still the raw filename
         // (i.e., no metadata provider has set a real title)
-        var rawName = Path.GetFileNameWithoutExtension(item.Path);
-        if (!string.Equals(item.Name, rawName, StringComparison.OrdinalIgnoreCase))
+        // Unless OverwriteExistingTitles is enabled
+        if (!Configuration.OverwriteExistingTitles)
         {
-            return;
+            var rawName = Path.GetFileNameWithoutExtension(item.Path);
+            if (!string.Equals(item.Name, rawName, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
         }
 
         var cleanTitle = _cleaner.Clean(item.Path);

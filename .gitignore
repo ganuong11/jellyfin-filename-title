@@ -23,3 +23,7 @@ publish/
 ## OS
 .DS_Store
 Thumbs.db
+FilenameTitlePlugin/obj
+FilenameTitlePlugin/bin
+FilenameTitlePlugin.Tests/obj
+FilenameTitlePlugin.Tests/bin
