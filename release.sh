@@ -18,7 +18,7 @@ VERSION="$1"
 PREV_TAG="${2:-}"
 
 DLL="FilenameTitlePlugin/bin/Release/net8.0/Jellyfin.Plugin.FilenameTitlePlugin.dll"
-ZIP="FilenameTitlePlugin.zip"
+ZIP="Jellyfin.Plugin.FilenameTitlePlugin.zip"
 
 rm -rf FilenameTitlePlugin/bin/Release
 dotnet build -c Release FilenameTitlePlugin/FilenameTitlePlugin.csproj
@@ -44,7 +44,7 @@ fi
 TMP="$(mktemp)"
 jq -n --arg category "Metadata" \
       --arg description "Sets item titles from cleaned-up filenames when no metadata provider has set a title." \
-      --arg guid "3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c" \
+      --arg guid "3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6d" \
       --arg imageUrl "" \
       --arg name "Filename Title" \
       --arg overview "Derive item titles from filenames" \
