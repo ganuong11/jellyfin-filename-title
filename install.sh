@@ -1,23 +1,43 @@
 #!/usr/bin/env bash
 set -e
 
-if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <version>" >&2
-  echo "Example: $0 1.1.3" >&2
+cd "$(dirname "$0")"
+
+CSPROJ="FilenameTitlePlugin/FilenameTitlePlugin.csproj"
+CURRENT_VERSION=$(grep -oE '<Version>[0-9.]+</Version>' "$CSPROJ" | sed -E 's|<Version>([0-9.]+)</Version>|\1|')
+
+print_usage() {
+  echo "Usage: $0 [<version>]"
+  echo "If <version> is omitted, increments the csproj's current version by 1 (3rd component)."
+  echo "Example: $0 1.1.4"
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  print_usage
+  exit 0
+fi
+
+if [[ $# -gt 1 ]]; then
+  print_usage >&2
   exit 1
 fi
 
-cd "$(dirname "$0")"
+if [[ $# -eq 0 ]]; then
+  IFS='.' read -r MAJOR MINOR BUILD _ <<< "$CURRENT_VERSION"
+  VERSION="${MAJOR}.${MINOR}.$((BUILD + 1))"
+else
+  VERSION="$1"
+fi
 
-VERSION="$1"
 ASSEMBLY_VERSION="${VERSION}.0"
 PLUGIN_DIR="/var/lib/jellyfin/plugins/Filename Title_${VERSION}"
 DLL="/Download/title/FilenameTitlePlugin/bin/Release/net8.0/Jellyfin.Plugin.FilenameTitlePlugin.dll"
 
-sed -i '' "s|<Version>[0-9.]*</Version>|<Version>${ASSEMBLY_VERSION}</Version>|" \
-  FilenameTitlePlugin/FilenameTitlePlugin.csproj
+echo "Installing Filename Title ${VERSION} (assembly ${ASSEMBLY_VERSION})"
 
-dotnet build -c Release FilenameTitlePlugin/FilenameTitlePlugin.csproj
+sed -i '' "s|<Version>[0-9.]*</Version>|<Version>${ASSEMBLY_VERSION}</Version>|" "$CSPROJ"
+
+dotnet build -c Release "$CSPROJ"
 
 sudo mkdir -p "$PLUGIN_DIR"
 sudo cp "$DLL" "$PLUGIN_DIR/"
