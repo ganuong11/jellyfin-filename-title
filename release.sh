@@ -44,7 +44,7 @@ fi
 TMP="$(mktemp)"
 jq -n --arg category "Metadata" \
       --arg description "Sets item titles from cleaned-up filenames when no metadata provider has set a title." \
-      --arg guid "3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6d" \
+      --arg guid "3f2a1b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c" \
       --arg imageUrl "" \
       --arg name "Filename Title" \
       --arg overview "Derive item titles from filenames" \
