@@ -17,8 +17,13 @@ fi
 VERSION="$1"
 PREV_TAG="${2:-}"
 
+CSPROJ="FilenameTitlePlugin/FilenameTitlePlugin.csproj"
 DLL="FilenameTitlePlugin/bin/Release/net8.0/Jellyfin.Plugin.FilenameTitlePlugin.dll"
 ZIP="Jellyfin.Plugin.FilenameTitlePlugin.zip"
+
+# Patch the csproj's <Version> to match the release version so the built DLL
+# and the manifest agree. Version is required (no auto-pump).
+sed -i '' "s|<Version>[0-9.]*</Version>|<Version>${VERSION}</Version>|" "$CSPROJ"
 
 rm -rf FilenameTitlePlugin/bin/Release
 dotnet build -c Release FilenameTitlePlugin/FilenameTitlePlugin.csproj
