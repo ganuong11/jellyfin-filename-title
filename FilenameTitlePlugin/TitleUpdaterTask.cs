@@ -31,12 +31,14 @@ public class TitleUpdaterTask : IScheduledTask
 
     public async Task ExecuteAsync(IProgress<double> progress, CancellationToken cancellationToken)
     {
-        var items = _libraryManager.GetItemList(new InternalItemsQuery
+        var result = _libraryManager.QueryItems(new InternalItemsQuery
         {
             IsFolder = false,
-            Recursive = true
+            Recursive = true,
+            Limit = null
         });
 
+        var items = result.Items;
         var total = items.Count;
         if (total == 0)
         {
