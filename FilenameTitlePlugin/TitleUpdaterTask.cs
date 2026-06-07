@@ -2,6 +2,7 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Querying;
 using MediaBrowser.Model.Tasks;
+using Jellyfin.Data.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.FilenameTitlePlugin;
@@ -35,7 +36,8 @@ public class TitleUpdaterTask : IScheduledTask
         {
             IsFolder = false,
             Recursive = true,
-            Limit = null
+            Limit = null,
+            IncludeItemTypes = [BaseItemKind.Movie, BaseItemKind.Episode, BaseItemKind.Video, BaseItemKind.MusicVideo]
         });
 
         var items = result.Items;
